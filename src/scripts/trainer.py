@@ -1,15 +1,23 @@
-import pandas as pd
+import json
 import joblib
 import argparse
+
 from lightgbm import LGBMClassifier
+from sklearn.model_selection import GridSearchCV
 
 from src.utils.load import load_to_df
+from src.utils.processing import extract_features
 
-def extract_features(df):
-    # Conteo de OVER por símbolo
-    feature_df = df.groupby("planets_intensity")["result"].value_counts().unstack().fillna(0)
-    feature_df["percent_over"] = feature_df.get("OVER", 0) / (feature_df.get("OVER", 0) + feature_df.get("UNDER", 0) + 1e-5)
-    return feature_df.reset_index()
+PARAM_GRID = {
+    'num_leaves': [15],
+    'max_depth': [-1, 5],
+    'learning_rate': [0.01, 0.05],
+    'n_estimators': [50, 100],
+    'subsample': [0.6],
+    'colsample_bytree': [0.6, 0.8]
+}
+
+TEST_DIR = "tests"
 
 def prepare_training_data(df):
     df = df.copy()
@@ -25,17 +33,31 @@ def parse_args():
     return parser.parse_args()
 
 def main():
+    print("Preparing data...", end=" ")
     df = load_to_df(args.input)
-    
     data = prepare_training_data(df)
     X = data[["percent_over"]]
     y = data["label"]
+    print("Done")
 
-    model = LGBMClassifier()
-    model.fit(X, y)
+    print("Training...", end=" ")
+    grid = GridSearchCV(LGBMClassifier(verbose=-1), PARAM_GRID, cv=5, scoring='accuracy', verbose=3)
+    grid.fit(X, y)
+    print("Done")
+
+    # Save the best model and parameters
+    model = grid.best_estimator_
+    best_params = grid.best_params_
+    with open("data/best_params.json", "w") as f:
+        json.dump(best_params, f, indent=4)
 
     joblib.dump(model, f"models/{args.output}")
-    print(f"Modelo guardado en models/{args.output}")
+    print(f"Model saved in models/{args.output}")
+
+    print("-"*20, "Testing", "-"*20)
+
+    for test in os.listdir(TEST_DIR)
+
 
 if __name__ == "__main__":
     args = parse_args()

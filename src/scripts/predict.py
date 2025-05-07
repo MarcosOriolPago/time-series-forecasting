@@ -1,6 +1,9 @@
-import pandas as pd
+import os
 import joblib
 import argparse
+
+from src.utils.load import load_to_df
+from src.utils.processing import extract_features
 
 def extract_features_from_history(history_df):
     feature_df = history_df.groupby("planets_intensity")["result"].value_counts().unstack().fillna(0)
@@ -12,32 +15,30 @@ def parse_args():
     parser.add_argument("--input", required=True, help="Path to daily Excel file")
     parser.add_argument("--model", required=True, help="Path to trained model file (pkl)")
     parser.add_argument("--history", required=True, help="Path to historical Excel file")
-    parser.add_argument("--output", default="predictions.csv", help="Output CSV with predictions")
-
     return parser.parse_args()
 
 def main():
     model = joblib.load(args.model)
 
-    daily_df = pd.read_excel(args.input, header=None, usecols=[0, 7, 11, 12, 13],
-                             names=["player", "result", "planets_combo", "intensity_degree", "planets_intensity"])
+    # Load the daily and historical data
+    daily_df = load_to_df(args.input)
+    history_df = load_to_df(args.history)
 
-    history_df = pd.read_excel(args.history, header=None, usecols=[0, 7, 11, 12, 13],
-                               names=["player", "result", "planets_combo", "intensity_degree", "planets_intensity"])
-
+    # Preprocess the daily data
     feature_lookup = extract_features_from_history(history_df)
-
+    # Merge the daily data with the feature lookup table
     daily_df = daily_df.merge(feature_lookup[["planets_intensity", "percent_over"]],
                               on="planets_intensity", how="left").fillna(0.5)  # valor neutro
 
+    # Predict the results using the model
     X = daily_df[["percent_over"]]
-    print(X)
     predictions = model.predict(X)
-    print(predictions)
     daily_df["predicted_result"] = ["OVER" if p == 1 else "UNDER" for p in predictions]
 
-    daily_df[["player", "planets_intensity", "predicted_result"]].to_csv(args.output, index=False)
-    print(f"Predicciones guardadas en {args.output}")
+    # Save the predictions to a CSV file
+    output_path = f"predictions/{os.path.basename(args.input).replace('.xlsx', '_predictions.csv')}"
+    daily_df[["player", "planets_intensity", "predicted_result"]].to_csv(output_path, index=False)
+    print(f"Predicciones guardadas en {output_path}")
 
 if __name__ == "__main__":
     args = parse_args()
