@@ -15,6 +15,13 @@ def load_to_df(file_path: str) -> pd.DataFrame:
 
 
 def prepare_training_data(df):
+    """
+    Prepare the training data by extracting features and creating labels. 
+    Args:
+        - df: DataFrame containing the data
+    Returns:
+        - DataFrame with features and labels
+    """
     df = df.copy()
     features = extract_features(df)
     df = df.merge(features[["planets_intensity", "percent_over"]], on="planets_intensity", how="left")

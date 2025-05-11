@@ -4,8 +4,7 @@ import argparse
 
 from lightgbm import LGBMClassifier
 
-from src.utils.load import load_to_df
-from src.utils.load import prepare_training_data
+from src.utils.load import load_to_df, prepare_training_data
 from src.globals import DEFAULT_PARAMS
 
 
