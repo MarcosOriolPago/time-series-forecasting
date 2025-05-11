@@ -4,8 +4,7 @@ import argparse
 
 from src.utils.load import load_to_df
 from src.utils.processing import extract_features
-
-OUTPUT_DIR = "data/predictions"
+from src.globals import PREDICTIONS_OUTPUT_DIR
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -33,7 +32,7 @@ def main():
     daily_df["predicted_result"] = ["OVER" if p == 1 else "UNDER" for p in predictions]
 
     # Save the predictions to a CSV file
-    output_path = f"{OUTPUT_DIR}/{os.path.basename(args.input).replace('.xlsx', '_predictions.csv')}"
+    output_path = f"{PREDICTIONS_OUTPUT_DIR}/{os.path.basename(args.input).replace('.xlsx', '_predictions.csv')}"
     daily_df[["player", "planets_intensity", "predicted_result"]].to_csv(output_path, index=False)
     print(f"Predicciones guardadas en {output_path}")
 

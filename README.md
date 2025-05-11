@@ -1,8 +1,10 @@
 # 📈 LightGBM Model Trainer & Predictor
 
-This project provides two main Python scripts to train a LightGBM model using historical sports data and make predictions based on new daily inputs.
+Train a LightGBM model using historical sports data and make predictions based on new daily inputs. 
 
-- `trainer.py`: trains the model using historical Excel data and performs cross-validation.
+- `find_best_params.py`: By cross validation with multiple combinations, it finds the best parameters for optimizing accuracy.
+- `train_model.py`: trains the model using historical Excel data.
+- `test_model_performance.py`: Tests the accuracy of a trained model over a set of tests.
 - `predict.py`: applies a trained model to daily data and outputs predictions.
 
 ---
@@ -33,37 +35,61 @@ This project provides two main Python scripts to train a LightGBM model using hi
 --- 
 
 ## 🏋️‍♂️ Training the Model
-The training script loads historical Excel data, extracts features, tunes hyperparameters with cross-validation, and saves the best model.
+The training script loads historical Excel data, extracts features and trains the model.
 
 ### 🔢 Input
-- Historical Excel file (e.g., `aHistorical_01012024_02142025.xlsx`) containing:
+- `--input`: Historical Excel file (e.g., `data/training/aHistorical_01012024_02142025.xlsx`).
 
-- A percent_over feature column
+- `--output`: Name of the trained model.
 
-- A label column with binary targets (0/1)
+- `--params` (Optional): Params json file path.
 
 ### 💾 Output
-- Trained model (.pkl) saved under models/
-
-- Best hyperparameters saved to data/best_params.json
-
-- Console output showing cross-validation progress and test accuracy
+- Trained model (.pkl) saved under `models/`
 
 ### ▶️ Usage
 ```bash
-python -m src.scripts.trainer --input data/training/aHistorical_01012024_02142025.xlsx --output history.pkl
+python -m src.scripts.train_model --input data/training/aHistorical_01012024_02142025.xlsx --output history.pkl
+```
+*Optionally, you can add precomputed hyperparameters.*
+
+```bash
+python -m src.scripts.train_model --input data/training/aHistorical_01012024_02142025.xlsx --output history.pkl --params data/best_params.json
+```
+---
+
+## 🔍 Find best parameters
+
+Iterate through different combinations of hyperparameters, and see which combination results in the higest performance.
+
+```bash
+pyton -m src.scripts.find_best_params --input data/training/aHistorical_01012024_02142025.xlsx
 ```
 
-**This will:**
-- Load and preprocess the historical data.
+---
 
-- Run GridSearchCV on an LGBMClassifier (using only percent_over).
+## 📈 Testing performance
+Test trained model performance on some tests.
+```bash
+python -m src.scripts.test_model_performance --model models/history.pkl --tests_folder data/tests
+```
+- **Output**
+<pre><code>
+-------------------- Testing Model Performance -------------------- 
 
-- Save the best model to models/history.pkl.
+Model loaded from models/history.pkl
 
-- Save the grid search’s best parameters to data/best_params.json.
-
-- Automatically evaluate the model on all .xlsx files in data/tests/.
+Testing Daily__02152025.xlsx... Accuracy: 0.87
+Testing Daily__02162025.xlsx... Accuracy: 0.90
+Testing Daily__02172025.xlsx... Accuracy: 0.90
+Testing Daily__02182025.xlsx... Accuracy: 0.85
+Testing Daily__02192025.xlsx... Accuracy: 0.94
+Testing Daily__02202025.xlsx... Accuracy: 0.94
+Testing Daily__02212025.xlsx... Accuracy: 0.88
+Testing Daily__02222025.xlsx... Accuracy: 0.82
+Testing Daily__02232025.xlsx... Accuracy: 0.94
+Testing Daily__02242025.xlsx... Accuracy: 0.90
+</code></pre>
 
 ---
 
