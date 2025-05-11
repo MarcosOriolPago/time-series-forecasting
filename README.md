@@ -9,7 +9,7 @@ This project provides two main Python scripts to train a LightGBM model using hi
 
 ## ⚙️ Requirements
 
-- Python 3.8+
+- Python 3.12
 - [uv](https://github.com/astral-sh/uv) for virtual environment and dependency management
 - PowerShell (Windows) or your preferred shell for environment activation
 
@@ -18,6 +18,7 @@ This project provides two main Python scripts to train a LightGBM model using hi
 1. Install `uv` if you haven't:
     ```bash
     pip install uv
+    powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
     ```
 
 2. Initialize UV project
