@@ -5,10 +5,7 @@ import argparse
 from src.utils.load import load_to_df
 from src.utils.processing import extract_features
 
-def extract_features_from_history(history_df):
-    feature_df = history_df.groupby("planets_intensity")["result"].value_counts().unstack().fillna(0)
-    feature_df["percent_over"] = feature_df.get("OVER", 0) / (feature_df.get("OVER", 0) + feature_df.get("UNDER", 0) + 1e-5)
-    return feature_df.reset_index()
+OUTPUT_DIR = "data/predictions"
 
 def parse_args():
     parser = argparse.ArgumentParser()
@@ -25,7 +22,7 @@ def main():
     history_df = load_to_df(args.history)
 
     # Preprocess the daily data
-    feature_lookup = extract_features_from_history(history_df)
+    feature_lookup = extract_features(history_df)
     # Merge the daily data with the feature lookup table
     daily_df = daily_df.merge(feature_lookup[["planets_intensity", "percent_over"]],
                               on="planets_intensity", how="left").fillna(0.5)  # valor neutro
@@ -36,7 +33,7 @@ def main():
     daily_df["predicted_result"] = ["OVER" if p == 1 else "UNDER" for p in predictions]
 
     # Save the predictions to a CSV file
-    output_path = f"predictions/{os.path.basename(args.input).replace('.xlsx', '_predictions.csv')}"
+    output_path = f"{OUTPUT_DIR}/{os.path.basename(args.input).replace('.xlsx', '_predictions.csv')}"
     daily_df[["player", "planets_intensity", "predicted_result"]].to_csv(output_path, index=False)
     print(f"Predicciones guardadas en {output_path}")
 

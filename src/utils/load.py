@@ -1,4 +1,5 @@
 import pandas as pd
+from src.utils.processing import extract_features
 
 
 def load_to_df(file_path: str) -> pd.DataFrame:
@@ -11,3 +12,12 @@ def load_to_df(file_path: str) -> pd.DataFrame:
     )
 
     return data
+
+
+def prepare_training_data(df):
+    df = df.copy()
+    features = extract_features(df)
+    df = df.merge(features[["planets_intensity", "percent_over"]], on="planets_intensity", how="left")
+    df["label"] = df["result"].map({"OVER": 1, "UNDER": 0})
+    
+    return df[["percent_over", "label"]]
