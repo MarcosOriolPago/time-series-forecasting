@@ -10,12 +10,12 @@ from src.utils.load import load_to_df
 from src.utils.processing import prepare_training_data
 
 PARAM_GRID = {
-    'num_leaves': [15],
-    'max_depth': [-1, 5],
-    'learning_rate': [0.01, 0.05],
-    'n_estimators': [50],
-    'subsample': [0.6],
-    'colsample_bytree': [0.6]
+    'num_leaves': [15, 31, 63],
+    'max_depth': [-1, 5, 10],
+    'learning_rate': [0.01, 0.05, 0.1],
+    'n_estimators': [50, 100, 200],
+    'subsample': [0.6, 0.8, 1.0],
+    'colsample_bytree': [0.6, 0.8, 1.0]
 }
 TEST_DIR = "data/tests"
 PARAMS_PATH = "data/best_params.json"
