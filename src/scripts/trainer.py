@@ -7,7 +7,7 @@ from lightgbm import LGBMClassifier
 from sklearn.model_selection import GridSearchCV
 
 from src.utils.load import load_to_df
-from src.utils.processing import prepare_training_data
+from src.utils.load import prepare_training_data
 
 PARAM_GRID = {
     'num_leaves': [15, 31, 63],
