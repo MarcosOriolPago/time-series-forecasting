@@ -51,9 +51,7 @@ The training script loads historical Excel data, extracts features, tunes hyperp
 
 ### ▶️ Usage
 ```bash
-python -m src.scripts.trainer \
---input data/training/aHistorical_01012024_02142025.xlsx \
---output history.pkl
+python -m src.scripts.trainer --input data/training/aHistorical_01012024_02142025.xlsx --output history.pkl
 ```
 
 **This will:**
@@ -89,11 +87,9 @@ The prediction script loads a trained model and applies it to a new daily Excel 
 
 ### ▶️ Usage
 ```bash
-python -m src.scripts.predict \
-  --input tests/Daily__02152025.xlsx \
-  --model models/history.pkl \
-  --history data/training/aHistorical_01012024_02142025.xlsx
+python -m src.scripts.predict --input tests/Daily__02152025.xlsx --model models/history.pkl --history data/training/aHistorical_01012024_02142025.xlsx
 ```
+
 **This will:**
 
 - Load the trained model.
